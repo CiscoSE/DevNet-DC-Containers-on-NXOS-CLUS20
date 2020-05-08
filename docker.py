@@ -44,6 +44,9 @@ commands = [
     # Out with the old
     'guestshell destroy',
 
+    # Ensure bash shell is enabled
+    'feature bash-shell',
+
     # Setup DNS correctly
     'vrf context management',
     'ip domain-name clus20.internal',
