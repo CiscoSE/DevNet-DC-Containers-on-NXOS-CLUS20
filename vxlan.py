@@ -126,7 +126,7 @@ def generate_nve(switch, first_run=False):
 
     for x in response:
         vni = x['vni']
-        state = state_lables[x['vni-state']]
+        state = state_labels[x['vni-state']]
         vni_type = x['type'][0:2]
         id = x['type'][4:-1]
         mcast = x['mcast']
