@@ -202,12 +202,8 @@ def generate(switch):
     except vxlanException:
         pass
 
-    # Get fabric data
-    if 'nve1' in fabric_data.interfaces:
+    try:
+        generate_l2route(switch, first_run)
+    except vxlanException:
         pass
 
-    underlay_interfaces = [
-        'loopback0', 'loopback1', 'loopback100'
-    ]
-
-    print(fabric_data.interfaces['connected'])
