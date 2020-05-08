@@ -113,9 +113,9 @@ class nxapi(object):
                             auth=self.__credentials()
                             )
 
-        # Convert response to manageable JSON, return status if requested
+        # Convert response to return status if requested
         if status:
-            return response_raw.json(), response_raw.status_code
+            return response_raw.status_code
 
         return response_raw.json()
 
@@ -132,6 +132,6 @@ class nxapi(object):
 
     def _test_connection(self):
         payload = self.payload('show version')
-        response, status = self.post(payload, status=True)
+        status = self.post(payload, status=True)
         if status >= 400:
             raise nxapiException('Status code: {0}'.format(status))
