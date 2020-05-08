@@ -48,7 +48,7 @@ vni_state = prometheus_client.Gauge(
     'vni_state', 'Track VNI State', ('vni', 'type', 'id', 'mcast')
 )
 
-l2route_seqn = prometheus_client.Counter(
+l2route_seqn = prometheus_client.Gauge(
     'l2route_seq_number', 'Track sequence number for Type-2 routes',
     ('mac', 'ip', 'nh', 'vlan')
 )
