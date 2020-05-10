@@ -119,11 +119,13 @@ def generate_l2route(switch, first_run=False):
         l2route_seqn.labels(mac=mac, ip=ip, nh=nh, vlan=vlan).set(seq)
 
         latest.append(
-            'vlan': vlan,
-            'mac': mac,
-            'ip': ip,
-            'nh': nh,
-            'seq': seq
+            {
+                'vlan': vlan,
+                'mac': mac,
+                'ip': ip,
+                'nh': nh,
+                'seq': seq
+            }
         )
 
     fabric_data.l2route = latest
