@@ -37,13 +37,13 @@ from nxapi import arguments, connection
 import vxlan
 
 
-def generate(switch):
+def generate(switch, verbose):
     """
     generate(switch) - call all the metric generation methods against
     the provided switch object
     """
 
-    vxlan.generate(switch)
+    vxlan.generate(switch, verbose)
 
 
 if __name__ == '__main__':
