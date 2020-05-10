@@ -72,7 +72,7 @@ if __name__ == '__main__':
     # As a metric generator, we loop/poll on these tasks forever
     while True:
         # Trigger generation and collection preparation
-        generate(switch)
+        generate(switch, verbose)
 
         # Sleep until the next interval
         time.sleep(sleep_interval)

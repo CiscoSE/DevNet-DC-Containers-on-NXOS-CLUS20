@@ -77,6 +77,8 @@ class fabric:
             'dci-links': [],
         }
 
+        self.nve = []
+        self.l2route = []
 
 def fetch_table_results(switch, command, id=None):
     payload = switch.payload(command)
@@ -100,10 +102,13 @@ def fetch_table_results(switch, command, id=None):
 
 
 def generate_l2route(switch, first_run=False):
+    global fabric_data
+
     response = fetch_table_results(switch, 
         'show l2route evpn mac-ip all', id='l2route_mac_ip_all'
     )
 
+    latest = []
     for x in response:
         mac = x['mac-addr']
         ip = x['host-ip']
@@ -113,10 +118,21 @@ def generate_l2route(switch, first_run=False):
 
         l2route_seqn.labels(mac=mac, ip=ip, nh=nh, vlan=vlan).set(seq)
 
+        latest.append(
+            'vlan': vlan,
+            'mac': mac,
+            'ip': ip,
+            'nh': nh,
+            'seq': seq
+        )
+
+    fabric_data.l2route = latest
     return
 
 
 def generate_nve(switch, first_run=False):
+    global fabric_data
+
     response = fetch_table_results(switch, 'show nve vni', id='nve_vni')
 
     state_labels = {
@@ -124,6 +140,7 @@ def generate_nve(switch, first_run=False):
         'Down': 0,
     }
 
+    latest = []
     for x in response:
         vni = x['vni']
         state = state_labels[x['vni-state']]
@@ -133,6 +150,17 @@ def generate_nve(switch, first_run=False):
 
         vni_state.labels(vni=vni, type=vni_type, id=id, mcast=mcast).set(state)
 
+        latest.append(
+            {
+                'vni': vni,
+                'state': state,
+                'type': vni_type,
+                'id': id,
+                'mcast': mcast
+            }
+        )
+
+    fabric_data.nve = latest
     return
 
 
@@ -180,7 +208,7 @@ def generate_interfaces(switch, first_run=False):
     return
 
 
-def generate(switch):
+def generate(switch, verbose=False):
     """
     Entry generate() point for other modules to call.
     
@@ -207,3 +235,18 @@ def generate(switch):
     except vxlanException:
         pass
 
+    # In a more perfect world, these would be classes and would
+    # handle their own representation efforts.
+    if verbose:
+        print('Interface Data')
+        for i in ['connected', 'notconnect', 'disabled']:
+            print(i)
+            print(fabric_data.interfaces[i])
+
+        print('NVE Data')
+        for entry in fabric_data.nve:
+            print(entry)
+
+        print('L2ROUTE Data')
+        for entry in fabric_data.l2route:
+            print(entry)
