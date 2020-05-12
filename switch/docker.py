@@ -82,9 +82,15 @@ commands = [
     'copy running-config startup-config',
 ]
 
+proxy_commands = [
+    'run bash sudo sed -E \'s,^#(export http.*),\1,g\' /etc/sysconfig/docker',  # noqa: E501
+    'run bash sudo service docker restart',
+    'copy running-config startup-config',
+]
+
 if __name__ == '__main__':
     # Fetch connection information from arguments/environment
-    host, port, username, password, verbose, ssl = arguments.process()
+    host, port, username, password, verbose, ssl, proxy = arguments.process()
 
     # Fetch a connection object for our target switch
     if ssl:
@@ -96,6 +102,9 @@ if __name__ == '__main__':
         host=host, port=port, protocol=protocol,
         username=username, password=password
     )
+
+    if proxy:
+        commands = commands + proxy_commands
 
     payload = switch.payload()
 
