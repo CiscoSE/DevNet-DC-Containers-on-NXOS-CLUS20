@@ -52,6 +52,9 @@ commands = [
     'ip domain-name clus20.internal',
     'ip name-server 208.67.222.222',
 
+    # Ensure NXAPI is using management VRF
+    'nxapi use-vrf management',
+
     # Initialize the Docker environment
     'run bash sudo service docker start',
     'run bash sudo chkconfig --add docker',
