@@ -43,8 +43,10 @@ def process(user='admin', password='admin', host='localhost', port='23456'):
         - ssl
 
     The values passed into the method would be the default values if the
-    CLI/ENV did not provide them.  Verbosity always defaults to off.
-    SSL encrypted transport always defaults to off.
+    CLI/ENV did not provide them.
+        Verbosity always defaults to off.
+        SSL encrypted transport always defaults to off.
+        Proxy always defaults to off.
     """
 
     # Command line arguments to flag Docker environment
@@ -81,6 +83,11 @@ def process(user='admin', password='admin', host='localhost', port='23456'):
                         action='store_true'
                         )
 
+    parser.add_argument('-x', '--proxy',
+                        help='Flag proxy requirement',
+                        action='store_true',
+                        )
+
     args = parser.parse_args()
 
     # Enable output - can be overriden by Docker flag
@@ -94,6 +101,12 @@ def process(user='admin', password='admin', host='localhost', port='23456'):
         ssl = True
     else:
         ssl = False
+
+    # Is there a proxy required
+    if args.proxy:
+        proxy = True
+    else:
+        proxy = False
 
     # Credentials
     if args.user:
@@ -119,4 +132,4 @@ def process(user='admin', password='admin', host='localhost', port='23456'):
         ssl = False
         verbose = False
 
-    return host, port, user, password, verbose, ssl
+    return host, port, user, password, verbose, ssl, proxy
