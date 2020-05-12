@@ -1,19 +1,20 @@
 FROM  fedora:latest
 LABEL maintainer "Tim Miller <timmil@cisco.com>"
 
-WORKDIR /opt
-
 # Update all packages, install pip, clean packages
 RUN     dnf update -y \
-          && dnf install -y python3-pip \
-          && dnf clean all
+            && dnf install -y python3-pip \
+            && dnf clean all
+
+# Copy Python package source
+COPY    nxapi /root/nxapi
+WORKDIR /root/nxapi
 
 # Install required Python modules
-COPY    requirements.txt /root/requirements.txt
-RUN     yes | pip3 install --upgrade -r /root/requirements.txt
+RUN     python3 setup.py install
 
-COPY    nxapi /opt/nxapi
-ADD     generate.py vxlan.py /opt/
+COPY    application /opt/
+WORKDIR /opt
 
 EXPOSE  8888
 USER    nobody
