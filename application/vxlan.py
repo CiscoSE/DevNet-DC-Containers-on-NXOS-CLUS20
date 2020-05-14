@@ -53,8 +53,10 @@ l2route_seqn = prometheus_client.Gauge(
     ('mac', 'ip', 'nh', 'vlan')
 )
 
+
 class vxlanException(Exception):
     pass
+
 
 class fabric:
     """
@@ -80,6 +82,7 @@ class fabric:
         self.nve = []
         self.l2route = []
 
+
 def fetch_table_results(switch, command, id=None):
     payload = switch.payload(command)
     response = switch.post(payload)
@@ -94,7 +97,7 @@ def fetch_table_results(switch, command, id=None):
 
     if id is None:
         return response['result']['body']
-    
+
     table = 'TABLE_{0}'.format(id)
     row = 'ROW_{0}'.format(id)
 
@@ -104,8 +107,8 @@ def fetch_table_results(switch, command, id=None):
 def generate_l2route(switch, first_run=False):
     global fabric_data
 
-    response = fetch_table_results(switch, 
-        'show l2route evpn mac-ip all', id='l2route_mac_ip_all'
+    response = fetch_table_results(
+        switch, 'show l2route evpn mac-ip all', id='l2route_mac_ip_all'
     )
 
     latest = []
@@ -169,13 +172,15 @@ def generate_nve(switch, first_run=False):
 def generate_interfaces(switch, first_run=False):
     global fabric_data
 
-    response = fetch_table_results(switch, 'show interface status', 'interface')
+    response = fetch_table_results(
+        switch, 'show interface status', 'interface'
+    )
 
     connected = []
     notconnect = []
     disabled = []
     int_type = {}
-    
+
     for x in response:
         if x['vlan'] == '--':
             continue
@@ -213,7 +218,7 @@ def generate_interfaces(switch, first_run=False):
 def generate(switch, verbose=False):
     """
     Entry generate() point for other modules to call.
-    
+
     Connection object 'switch' expected with valid connection information
     pre-populated and ready to consume
     """
