@@ -35,6 +35,7 @@ import prometheus_client
 # Import modules from this repo
 from nxapi import arguments, connection
 import vxlan
+import routing
 
 
 def generate(switch, verbose):
@@ -43,7 +44,8 @@ def generate(switch, verbose):
     the provided switch object
     """
 
-    vxlan.generate(switch, verbose)
+    vxlan.generate(switch, verbose=verbose)
+    routing.generate(switch, verbose=verbose)
 
 
 if __name__ == '__main__':
@@ -52,7 +54,7 @@ if __name__ == '__main__':
     sleep_interval = 5
 
     # Fetch connection information from arguments/environment
-    host, port, username, password, verbose, ssl = arguments.process()
+    host, port, username, password, verbose, ssl, proxy = arguments.process()
 
     # Fetch a connection object for our target switch
     if ssl:
