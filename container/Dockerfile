@@ -16,6 +16,9 @@ RUN     python3 setup.py install
 COPY    application /opt/
 WORKDIR /opt
 
+# Ensure all dependencies are installed
+RUN     yes | pip3 install -r /opt/requirements.txt
+
 EXPOSE  8888
 USER    nobody
 
