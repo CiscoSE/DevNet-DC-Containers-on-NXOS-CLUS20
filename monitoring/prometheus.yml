@@ -1,0 +1,56 @@
+# file: 03-collect/prometheus.yml
+#
+# Sample prometheus.yml configuration foundation:
+#   - https://github.com/prometheus/prometheus/blob/master/documentation/examples/prometheus.yml
+#
+# Modified to scrape the DEVWKS-2594 02-collect/collect.py script
+#
+# my global config
+global:
+  scrape_interval:     5s # Set the scrape interval to every 10 seconds. Default is every 1 minute.
+  evaluation_interval: 5s # Evaluate rules every 10 seconds. The default is every 1 minute.
+  scrape_timeout:      4s  # scrape_timeout is set to the global default (5s).
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'fabric1-leaf1'
+    static_configs:
+    - targets: ['10.60.66.111:8888']
+
+  - job_name: 'fabric1-leaf2'
+    static_configs:
+    - targets: ['10.60.66.112:8888']
+
+  - job_name: 'fabric2-leaf1'
+    static_configs:
+    - targets: ['10.60.66.211:8888']
+
+  - job_name: 'fabric2-leaf2'
+    static_configs:
+    - targets: ['10.60.66.212:8888']
+
+  - job_name: 'fabric1-bgw1'
+    static_configs:
+    - targets: ['10.60.66.131:8888']
+
+  - job_name: 'fabric1-bgw2'
+    static_configs:
+    - targets: ['10.60.66.132:8888']
+
+  - job_name: 'fabric2-bgw1'
+    static_configs:
+    - targets: ['10.60.66.231:8888']
+
+  - job_name: 'fabric2-bgw2'
+    static_configs:
+    - targets: ['10.60.66.232:8888']
