@@ -35,7 +35,7 @@ from nxapi import connection
 
 if __name__ == '__main__':
     # Fetch connection information from arguments/environment
-    host, port, username, password, verbose, ssl, proxy = arguments.process()
+    host, port, user, password, verbose, ssl, proxy = arguments.process()
 
     # Fetch a connection object for our target switch
     if ssl:
@@ -45,13 +45,13 @@ if __name__ == '__main__':
 
     switch = connection.nxapi(
         host=host, port=port, protocol=protocol,
-        username=username, password=password
+        username=user, password=password
     )
 
     command = 'run bash sudo docker run -d --restart always '
     command += '--name vxlan -p {0}:8888:8888 '.format(host)
     command += '-e NXAPI_HOST={0} -e NXAPI_PORT={1} '.format(host, port)
-    command += '-e NXAPI_USER={0} -e NXAPI_PASS={1} '.format(username, password)
+    command += '-e NXAPI_USER={0} -e NXAPI_PASS={1} '.format(user, password)
     command += 'gvevsetim/devnet-dc-clus20'
 
     if verbose:
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         if response['result'] is not None:
             if 'msg' in response['result']:
                 print('Success: ' + response['result']['msg'])
-                
+
     # Print error output
     elif 'error' in response:
         if response['error'] is not None:
