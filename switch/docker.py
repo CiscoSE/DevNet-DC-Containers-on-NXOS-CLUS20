@@ -42,7 +42,7 @@ commands = [
     'configure terminal',
 
     # Out with the old
-    'guestshell destroy',
+    ('guestshell destroy', 'continue-on-error'),
 
     # Ensure bash shell is enabled
     'feature bash-shell',
@@ -53,7 +53,7 @@ commands = [
     'ip name-server 208.67.222.222',
 
     # Ensure NXAPI is using management VRF
-    'nxapi use-vrf management',
+    ('nxapi use-vrf management', 'continue-on-error'),
 
     # Initialize the Docker environment
     'run bash sudo service docker start',
@@ -114,7 +114,10 @@ if __name__ == '__main__':
     for cmd in commands:
         if verbose:
             print(cmd)
-        payload.add_command(cmd)
+        if isinstance(cmd, tuple):
+            payload.add_command(command=cmd[0], rollback=cmd[1])
+        else:
+            payload.add_command(cmd)
 
     if verbose:
         print(json.dumps(payload.post_input(), indent=4))
