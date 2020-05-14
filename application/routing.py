@@ -119,6 +119,12 @@ def generate_prefix_paths(switch, vrf, verbose=False):
                 continue
 
             nexthop = path['ipnexthop']
+
+            # Account for external routes (not implementing RNH resolution)
+            # Underlay internal routes will collect the statistics anyways
+            if 'ifname' not in path:
+                continue
+
             uptime = isodate.parse_duration(path['uptime']).total_seconds()
             uptime = int(uptime)
 
