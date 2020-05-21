@@ -31,7 +31,8 @@ sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
 sudo reboot
 ```
 
-If proxy setup required:
+If proxy setup required, modify the entries in http-proxy.conf to
+match your environment and then copy the file to the proper location:
 
 ```bash
 sudo mkdir /etc/systemd/system/docker.service.d
@@ -40,7 +41,7 @@ sudo cp http-proxy.conf /etc/systemd/system/docker.service.d
 sudo systemctl daemon-reload
 ```
 
-Enable and start Docker
+Enable and start Docker:
 
 ```bash
 sudo systemctl enable docker
@@ -60,6 +61,10 @@ container:
 
 ## Deploy Prometheus container
 
+Note: the prometheus.yml configuration is for the author's private lab.
+You will need to change the job_name entries to point to the switches
+in your environment.
+
 ```bash
     sudo docker run --name prometheus -d -p 9999:9090 \
             -v ${PWD}/prometheus.yml:/etc/prometheus/prometheus.yml \
@@ -74,6 +79,6 @@ container:
 ```
 
 Once Grafana has started, log into the web interface - URL is
-http://server_ip:3000 - with the credentials of admin/admin. Import the
+'http://server_ip:3000' - with the credentials of admin/admin. Import the
 grafana JSON file provided in this directory to provision the dashboards
 seen in the presentation.
