@@ -33,6 +33,20 @@ import json
 from nxapi import arguments
 from nxapi import connection
 
+pre_commands = [
+    # Prep for scripted configuration
+    'terminal dont-ask',
+
+    # Protect against switch reload
+    'configure terminal',
+
+    # Out with the old
+    'guestshell destroy',
+
+    # Ensure NXAPI is using management VRF
+    'nxapi use-vrf management',
+]
+
 commands = [
 
     # Prep for scripted configuration
@@ -41,9 +55,6 @@ commands = [
     # Protect against switch reload
     'configure terminal',
 
-    # Out with the old
-    ('guestshell destroy', 'continue-on-error'),
-
     # Ensure bash shell is enabled
     'feature bash-shell',
 
@@ -51,9 +62,6 @@ commands = [
     'vrf context management',
     'ip domain-name clus20.internal',
     'ip name-server 208.67.222.222',
-
-    # Ensure NXAPI is using management VRF
-    ('nxapi use-vrf management', 'continue-on-error'),
 
     # Initialize the Docker environment
     'run bash sudo service docker start',
@@ -86,10 +94,59 @@ commands = [
 ]
 
 proxy_commands = [
-    'run bash sudo sed -E \'s,^#(export http.*),\1,g\' /etc/sysconfig/docker',  # noqa: E501
+    'run bash sudo sed -i -E \'s,^#(export http.*),\\1,g\' /etc/sysconfig/docker',  # noqa: E501
     'run bash sudo service docker restart',
     'copy running-config startup-config',
 ]
+
+def process_response(response):
+    if not isinstance(response, list):
+        print(str(response))
+    else:
+        for i, r in enumerate(response):
+            # Print output from successful commands
+            if 'result' in r:
+                if r['result'] is not None:
+                    if 'msg' in r['result']:
+                        print(r['result']['msg'])
+            # Print error output
+            elif 'error' in r:
+                print("Error in command {0}".format(i))
+                print("\t{0}".format(commands[i]))
+                if r['error'] is not None:
+                    if 'message' in r['error']:
+                        print(r['error']['message'])
+                    if 'data' in r['error']:
+                        if 'msg' in r['error']['data']:
+                            print(r['error']['data']['msg'])
+            # Print generic output in failure
+            else:
+                print(r)
+
+def execute_commands(switch, commands, rollback=None, verbose=False):
+    payload = switch.payload()
+
+    # Support a global error handling mode
+    if rollback:
+        payload._error = rollback
+
+    # Loop through commands and add to payload
+    for cmd in commands:
+        if verbose:
+            print(cmd)
+
+        # Support command specific error handling
+        if isinstance(cmd, tuple):
+            payload.add_command(command=cmd[0], rollback=cmd[1])
+        else:
+            payload.add_command(cmd)
+
+    if verbose:
+        print(json.dumps(payload.post_input(), indent=4))
+
+    response = switch.post(payload)
+    process_response(response)
+
 
 if __name__ == '__main__':
     # Fetch connection information from arguments/environment
@@ -106,41 +163,9 @@ if __name__ == '__main__':
         username=username, password=password
     )
 
+    execute_commands(switch, pre_commands, 'continue-on-error', verbose)
+    execute_commands(switch, commands, verbose=verbose)
+
     if proxy:
-        commands = commands + proxy_commands
+        execute_commands(switch, proxy_commands, verbose=verbose)
 
-    payload = switch.payload()
-
-    for cmd in commands:
-        if verbose:
-            print(cmd)
-        if isinstance(cmd, tuple):
-            payload.add_command(command=cmd[0], rollback=cmd[1])
-        else:
-            payload.add_command(cmd)
-
-    if verbose:
-        print(json.dumps(payload.post_input(), indent=4))
-
-    response = switch.post(payload)
-
-    if not isinstance(response, list):
-        print(str(response))
-    else:
-        for r in response:
-            # Print output from successful commands
-            if 'result' in r:
-                if r['result'] is not None:
-                    if 'msg' in r['result']:
-                        print(r['result']['msg'])
-            # Print error output
-            elif 'error' in r:
-                if r['error'] is not None:
-                    if 'message' in r['error']:
-                        print(r['error']['message'])
-                    if 'data' in r['error']:
-                        if 'msg' in r['error']['data']:
-                            print(r['error']['data']['msg'])
-            # Print generic output in failure
-            else:
-                print(r)
