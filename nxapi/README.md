@@ -17,6 +17,16 @@ Note: if you are looking for something more feature rich, you might consider
 the nxapi_plumbing package found here: <https://github.com/ktbyers/nxapi-plumbing>
 I have not used it myself nor do I know the author. Your mileage may vary.
 
+## Package Installation Instructions
+
+Standard Python package installation methods, after activating your Python
+virtual environment (${VENV} is the path to your virtual environment).
+
+```bash
+source ${VENV}/bin/activate
+python setup.py install
+```
+
 ## Packages Examples
 
 Run the "show version" CLI command on the switch and extract the NX-OS version.
